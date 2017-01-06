@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Do">
+
+	<select id="selectByDate" parameterType="com.pnt.doe.DoVO" resultType="com.pnt.doe.DoVO">
+		SELECT  T.*
+		FROM    (
+		        SELECT	1 AS SEQ,
+			                PO.CD_ITEM AS itemCode, 
+			                REPLACE(PO.NM_ITEM, '"', '') AS itemName,
+			                --'' as  itemName,
+			                PO.CD_PARTNER AS partnerCode, 
+			                
+			                PO.CD_ITEM AS comCol1,
+			                --PO.NM_ITEM AS comCol2,
+			                REPLACE(REPLACE(PO.NM_ITEM, '"', ''), CHAR(9), '') AS comCol2,
+			                <!-- '' as comCol2, -->
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_PO_MM),1),'.00','') AS comQty, 
+			                
+			                PO.CD_UNIT_MM AS unit,
+			                REPLACE(PO.STND_ITEM, '"', '') AS stndItem,
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_PO_MM),1),'.00','') AS poMonthQt, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_REMAINDER),1),'.00','') AS remainQt, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D1),0)),1),'.00','') AS d1, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D2),0)),1),'.00','') AS d2, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D3),0)),1),'.00','') AS d3, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D4),0)),1),'.00','') AS d4, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D5),0)),1),'.00','') AS d5, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D6),0)),1),'.00','') AS d6,  
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D7),0)),1),'.00','') AS d7,
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, 
+			                            ISNULL(SUM(MM.D1),0) +
+			                            ISNULL(SUM(MM.D2),0) +
+			                            ISNULL(SUM(MM.D3),0) +
+			                            ISNULL(SUM(MM.D4),0) +
+			                            ISNULL(SUM(MM.D5),0) +
+			                            ISNULL(SUM(MM.D6),0) +
+			                            ISNULL(SUM(MM.D7),0)
+			                        ),1),'.00','') AS SUM
+		        FROM    (SELECT  CD_ITEM,  
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,0,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D1, 
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,1,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D2,
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,2,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D3,
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,3,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D4,
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,4,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D5,
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,5,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D6,
+				                        (CASE WHEN DT_DO = convert(varchar(10),dateadd(d,6,CONVERT(date, #{condDate})),112) THEN QT_DO END) AS D7
+		                  FROM   BOS.dbo.PUR_DO 
+		                 WHERE  DT_DO BETWEEN convert(varchar(10),dateadd(d,0,CONVERT(date, #{condDate})),112) 
+		                                        AND convert(varchar(10),dateadd(d,6,CONVERT(date, #{condDate})),112) AND SEQ_DO = 0
+		                 GROUP BY CD_ITEM, DT_DO, QT_DO) MM	
+		                 RIGHT OUTER JOIN  
+		                 (SELECT  L.CD_ITEM, M.NM_ITEM, L.CD_UNIT_MM, M.STND_ITEM, H.CD_PARTNER,
+		                          SUM(L.QT_PO_MM) AS QT_PO_MM, 
+		                          (SUM(L.QT_PO_MM)-SUM(L.QT_RCV_MM)) AS QT_REMAINDER 
+		                    FROM  NEOE.PU_POH H 
+		                          INNER JOIN NEOE.PU_POL L 
+		                            ON  H.CD_COMPANY = '1000' 
+		                            AND H.CD_PLANT = '2000' 
+		                            AND H.NO_PO = L.NO_PO 
+		                          INNER JOIN NEOE.MA_PITEM M 
+		                            ON  M.CD_COMPANY = '1000' 
+		                            AND L.CD_ITEM = M.CD_ITEM 
+		                  WHERE   1 = 1
+		                  <if test="condPartnerCode != 'admin' and condPartnerCode != 'ADMIN'">
+				          AND     H.CD_PARTNER = #{condPartnerCode}
+				          </if>
+		                  AND     L.DT_LIMIT BETWEEN (DATENAME(YEAR,CONVERT(date, #{condDate})) + DATENAME(month,CONVERT(date, #{condDate}))+'01') 
+		                                         AND convert(varchar(10),DATEADD(day, -1,DATEADD(MONTH, 1,DATENAME(YEAR,CONVERT(date, #{condDate})) + DATENAME(month,CONVERT(date, #{condDate}))+'01')),112)
+		                  GROUP BY L.CD_ITEM, M.NM_ITEM, L.CD_UNIT_MM, M.STND_ITEM, H.CD_PARTNER) PO 
+		                    ON MM.CD_ITEM = PO.CD_ITEM
+		        GROUP BY PO.CD_ITEM, PO.NM_ITEM, PO.CD_PARTNER, PO.CD_UNIT_MM, PO.STND_ITEM, PO.QT_PO_MM, PO.QT_REMAINDER
+		        
+		        UNION ALL
+		        
+		        SELECT	2 AS SEQ,
+			                PO.CD_ITEM AS itemCode, 
+			                REPLACE(PO.NM_ITEM, '"', '') AS itemName,
+			                --'' as  itemName, 
+			                PO.CD_PARTNER AS partnerCode, 
+			                
+			                PO.CD_UNIT_MM AS comCol1,
+			                REPLACE(REPLACE(PO.STND_ITEM, '"', ''), CHAR(9), '') AS comCol2,
+			                --'' as comCol2,
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_REMAINDER),1),'.00','') AS comQty, 
+			                
+			                PO.CD_UNIT_MM AS unit,
+			                REPLACE(PO.STND_ITEM, '"', '') AS stndItem,
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_PO_MM),1),'.00','') AS poMonthQt, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, PO.QT_REMAINDER),1),'.00','') AS remainQt, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D1),0)),1),'.00','') AS d1, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D2),0)),1),'.00','') AS d2, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D3),0)),1),'.00','') AS d3, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D4),0)),1),'.00','') AS d4, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D5),0)),1),'.00','') AS d5, 
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D6),0)),1),'.00','') AS d6,  
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ISNULL(SUM(MM.D7),0)),1),'.00','') AS d7,
+			                REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, 
+			                            ISNULL(SUM(MM.D1),0) +
+			                            ISNULL(SUM(MM.D2),0) +
+			                            ISNULL(SUM(MM.D3),0) +
+			                            ISNULL(SUM(MM.D4),0) +
+			                            ISNULL(SUM(MM.D5),0) +
+			                            ISNULL(SUM(MM.D6),0) +
+			                            ISNULL(SUM(MM.D7),0)
+			                        ),1),'.00','') AS SUM
+		        FROM    (SELECT  T1.CD_PARTNER, T1.CD_ITEM,  
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,0,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D1, 
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,1,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D2,
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,2,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D3,
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,3,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D4,
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,4,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D5,
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,5,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D6,
+				                        (CASE WHEN T1.DT_DO = convert(varchar(10),dateadd(d,6,CONVERT(date, #{condDate})),112) THEN T1.QT_DO END) AS D7
+			                  FROM   BOS.DBO.PUR_DO T1,
+			                             (SELECT CD_PARTNER, CD_ITEM, DT_DO, MAX(SEQ_DO) AS SEQ_DO
+			                              FROM BOS.DBO.PUR_DO
+			                              WHERE  DT_DO BETWEEN convert(varchar(10),dateadd(d,0,CONVERT(date, #{condDate})),112) 
+			                              AND convert(varchar(10),dateadd(d,6,CONVERT(date, #{condDate})),112) AND SEQ_DO > 0
+			                              GROUP BY CD_PARTNER, CD_ITEM, DT_DO) T2
+					          WHERE  T1.DT_DO BETWEEN convert(varchar(10),dateadd(d,0,CONVERT(date, #{condDate})),112) 
+					                                   AND convert(varchar(10),dateadd(d,6,CONVERT(date, #{condDate})),112)
+			                    <if test="condPartnerCode != 'admin' and condPartnerCode != 'ADMIN'">
+						        AND     T1.CD_PARTNER = #{condPartnerCode}
+						      </if>
+			                    AND     T1.CD_PARTNER = T2.CD_PARTNER
+			                    AND     T1.CD_ITEM = T2.CD_ITEM
+			                    AND     T1.DT_DO = T2.DT_DO
+			                    AND     T1.SEQ_DO = T2.SEQ_DO
+					           GROUP BY T1.CD_PARTNER, T1.CD_ITEM, T1.DT_DO, T1.QT_DO) MM	
+		                 RIGHT OUTER JOIN  
+		                 (SELECT  L.CD_ITEM, M.NM_ITEM, L.CD_UNIT_MM, M.STND_ITEM, H.CD_PARTNER,
+			                          SUM(L.QT_PO_MM) AS QT_PO_MM, 
+			                          (SUM(L.QT_PO_MM)-SUM(L.QT_RCV_MM)) AS QT_REMAINDER 
+		                    FROM  NEOE.PU_POH H 
+			                          INNER JOIN NEOE.PU_POL L 
+			                            ON  H.CD_COMPANY = '1000' 
+			                            AND H.CD_PLANT = '2000' 
+			                            AND H.NO_PO = L.NO_PO 
+			                          INNER JOIN NEOE.MA_PITEM M 
+			                            ON  M.CD_COMPANY = '1000' 
+			                            AND L.CD_ITEM = M.CD_ITEM 
+		                  WHERE   1 = 1
+		                  <if test="condPartnerCode != 'admin' and condPartnerCode != 'ADMIN'">
+					        AND     H.CD_PARTNER = #{condPartnerCode}
+					      </if>
+		                  AND     L.DT_LIMIT BETWEEN (DATENAME(YEAR,CONVERT(date, #{condDate})) + DATENAME(month,CONVERT(date, #{condDate}))+'01') 
+		                                         AND convert(varchar(10),DATEADD(day, -1,DATEADD(MONTH, 1,DATENAME(YEAR,CONVERT(date, #{condDate})) + DATENAME(month,CONVERT(date, #{condDate}))+'01')),112)
+		                  GROUP BY L.CD_ITEM, M.NM_ITEM, L.CD_UNIT_MM, M.STND_ITEM, H.CD_PARTNER) PO 
+		                    ON MM.CD_PARTNER = PO.CD_PARTNER AND MM.CD_ITEM = PO.CD_ITEM
+		        GROUP BY PO.CD_ITEM, PO.NM_ITEM, PO.CD_PARTNER, PO.CD_UNIT_MM, PO.STND_ITEM, PO.QT_PO_MM, PO.QT_REMAINDER
+		        ) T
+		ORDER BY  T.partnerCode,
+				  T.itemCode,
+		          T.itemName,
+		          T.SEQ
+	</select>
+	
+	<select id="selectDoPartners" parameterType="string" resultType="map">
+		SELECT	DISTINCT 
+					A.CD_PARTNER, 
+                	A.LN_PARTNER 
+		FROM   NEOE.MA_PARTNER A, 
+			       (
+					SELECT	DISTINCT h.CD_PARTNER 
+					FROM  	NEOE.PU_POH H 
+								INNER JOIN NEOE.PU_POL L 
+								ON  H.CD_COMPANY = '1000' 
+									AND H.CD_PLANT = '2000' 
+									AND H.NO_PO = L.NO_PO 
+								INNER JOIN NEOE.MA_PITEM M 
+								ON  M.CD_COMPANY = '1000' 
+									AND L.CD_ITEM = M.CD_ITEM 
+			        WHERE	1 = 1 
+			        AND		l.dt_limit BETWEEN ( Datename(year, CONVERT(DATE, #{condDate} )) + Datename(month, CONVERT(DATE, #{condDate})) + '01' ) 
+					AND		CONVERT(VARCHAR(10), Dateadd(day, -1, Dateadd(month, 1, Datename(year, CONVERT( DATE, #{condDate})) + Datename(month, CONVERT(DATE, #{condDate})) + '01')), 112)
+					) B 
+		WHERE  A.cd_company = '1000' 
+		AND	   A.cd_partner = B.cd_partner 
+		ORDER  BY A.cd_partner
+	</select>
+	
+	<select id="selectMaxSeqDO" parameterType="map" resultType="int">
+		SELECT	ISNULL(MAX(SEQ_DO),0) + 1 AS MAX_SEQ
+		FROM    BOS.DBO.PUR_DO
+		WHERE	CD_PARTNER = #{partnerCode}
+		AND		CD_ITEM = #{itemCode}
+		AND		DT_DO = REPLACE(#{date}, '-', '')
+	</select>
+	
+	<!-- <insert id="insertDo" parameterType="map">
+		INSERT INTO BOS.DBO.PUR_DO
+		(CD_PARTNER, CD_ITEM, DT_DO, SEQ_DO, QT_DO)
+		VALUES
+		(#{partnerCode}, #{itemCode}, #{date}, #{seq, jdbcType=NUMERIC}, #{qt})
+	</insert> -->
+	<insert id="insertDo" parameterType="map">
+		INSERT INTO BOS.DBO.PUR_DO
+		(CD_PARTNER, CD_ITEM, DT_DO, SEQ_DO, QT_DO, ID_INSERT, QT_DO_OLD, DT_INSERT)
+		VALUES
+		(#{partnerCode}, #{itemCode}, #{date}, #{seq, jdbcType=NUMERIC}, #{qt, jdbcType=NUMERIC}, #{seq, jdbcType=NUMERIC} - 1, (SELECT	QT_DO 
+																																				FROM		BOS.DBO.PUR_DO 
+																																				WHERE	CD_PARTNER = #{partnerCode}
+																																				AND		CD_ITEM =  #{itemCode}
+																																				AND		DT_DO =  #{date}
+																																				AND		SEQ_DO = #{seq, jdbcType=NUMERIC} - 1), GETDATE())
+	</insert>
+</mapper>

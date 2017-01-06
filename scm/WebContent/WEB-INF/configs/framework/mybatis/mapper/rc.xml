@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Rc">
+
+	<select id="getList" parameterType="com.pnt.rc.RcVO" resultType="com.pnt.rc.RcVO">
+			SELECT
+				ROW_NUMBER() OVER(ORDER BY A.CD_PARTNER, A.DT_IO, A.NO_IO, A.CD_ITEM) as num,
+				cd_partner,
+				no_io,
+				dt_io,
+				cd_item,
+				REPLACE(nm_item, '"', '') as nm_item,
+				REPLACE(stnd_item, '"', '') as stnd_item,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY,qt_io),1),'.00','') as qt_io,	
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY,qt_good_inv),1),'.00','') as qt_good_inv,	
+				nm_cd_exch,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, um_ex),1),'.00','') as um_ex,				
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, am_ex),1),'.00','') as am_ex,				
+				(case when yn_am = 'y'  then '유한' else '무한' end) as yn_am,
+				isnull(no_rev, '') as no_rev,
+				isnull(no_pso_mgmt, '') as no_pso_mgmt				
+			FROM
+(
+SELECT MP.LN_PARTNER AS CD_PARTNER, QH.NO_IO, QH.DT_IO, Q.CD_ITEM, MI.NM_ITEM, MI.STND_ITEM, (CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_IO ELSE Q.QT_IO END) AS QT_IO, (CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_GOOD_INV ELSE Q.QT_GOOD_INV END) AS QT_GOOD_INV, Z2.NM_SYSDEF AS NM_CD_EXCH, Q.UM_EX, Q.AM_EX, Q.YN_AM, PR.NO_REV, Q.NO_PSO_MGMT 
+		 FROM NEOE.MM_QTIOH AS QH LEFT OUTER JOIN 
+		      NEOE.MM_QTIO AS Q ON QH.NO_IO = Q.NO_IO AND QH.CD_COMPANY = Q.CD_COMPANY INNER JOIN 
+		      NEOE.PU_RCVL AS PR ON Q.NO_ISURCV = PR.NO_RCV AND Q.NO_ISURCVLINE = PR.NO_LINE AND Q.CD_COMPANY = PR.CD_COMPANY LEFT OUTER JOIN 
+		      NEOE.MA_PARTNER AS MP ON QH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000' LEFT OUTER JOIN
+		      NEOE.MA_PITEM AS MI ON Q.CD_ITEM = MI.CD_ITEM LEFT OUTER JOIN NEOE.MA_CODEDTL AS Z2 ON Q.CD_COMPANY = Z2.CD_COMPANY AND Q.CD_EXCH = Z2.CD_SYSDEF AND Z2.CD_FIELD = 'MA_B000005' 
+	   WHERE(QH.DT_IO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')) AND (Q.FG_PS = '1') AND (Q.FG_IO IN ('001', '030', '031')) AND (QH.CD_COMPANY = '1000') AND (QH.CD_PLANT = '2000' )   
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="rc_partner != null and rc_partner !=''"> AND QH.CD_PARTNER = #{rc_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND QH.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+	   UNION
+	   SELECT MP.LN_PARTNER AS CD_PARTNER, 'SUB_소계' AS NO_IO, QH.DT_IO,'' AS CD_ITEM, '' AS NM_ITEM, '' AS STND_ITEM, SUM(CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_IO ELSE Q.QT_IO END), SUM(CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_GOOD_INV ELSE Q.QT_GOOD_INV END), '' AS NM_CD_EXCH, 0 AS UM_EX, SUM(Q.AM_EX), '' AS YN_AM, '' AS NO_REV, '' AS NO_PSO_MGMT  
+		 FROM NEOE.MM_QTIOH AS QH LEFT OUTER JOIN 
+		      NEOE.MM_QTIO AS Q ON QH.NO_IO = Q.NO_IO AND QH.CD_COMPANY = Q.CD_COMPANY INNER JOIN 
+		      NEOE.PU_RCVL AS PR ON Q.NO_ISURCV = PR.NO_RCV AND Q.NO_ISURCVLINE = PR.NO_LINE AND Q.CD_COMPANY = PR.CD_COMPANY LEFT OUTER JOIN 
+		      NEOE.MA_PARTNER AS MP ON QH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000' LEFT OUTER JOIN
+		      NEOE.MA_PITEM AS MI ON Q.CD_ITEM = MI.CD_ITEM LEFT OUTER JOIN NEOE.MA_CODEDTL AS Z2 ON Q.CD_COMPANY = Z2.CD_COMPANY AND Q.CD_EXCH = Z2.CD_SYSDEF AND Z2.CD_FIELD = 'MA_B000005' 
+	   WHERE(QH.DT_IO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')) AND (Q.FG_PS = '1') AND (Q.FG_IO IN ('001', '030', '031')) AND (QH.CD_COMPANY = '1000') AND (QH.CD_PLANT = '2000' )   	   
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="rc_partner != null and rc_partner !=''"> AND QH.CD_PARTNER = #{rc_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND QH.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+	   GROUP BY MP.LN_PARTNER, QH.DT_IO
+	   UNION
+	   SELECT MP.LN_PARTNER AS CD_PARTNER, 'Total' AS NO_IO, '합계' AS DT_IO,'' AS CD_ITEM, '' AS NM_ITEM, '' AS STND_ITEM, SUM(CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_IO ELSE Q.QT_IO END), SUM(CASE WHEN QH.YN_RETURN = 'Y' THEN -Q.QT_GOOD_INV ELSE Q.QT_GOOD_INV END), '' AS NM_CD_EXCH, 0 AS UM_EX, SUM(Q.AM_EX), '' AS YN_AM, '' AS NO_REV, '' AS NO_PSO_MGMT 
+		 FROM NEOE.MM_QTIOH AS QH LEFT OUTER JOIN 
+		      NEOE.MM_QTIO AS Q ON QH.NO_IO = Q.NO_IO AND QH.CD_COMPANY = Q.CD_COMPANY INNER JOIN 
+		      NEOE.PU_RCVL AS PR ON Q.NO_ISURCV = PR.NO_RCV AND Q.NO_ISURCVLINE = PR.NO_LINE AND Q.CD_COMPANY = PR.CD_COMPANY LEFT OUTER JOIN 
+		      NEOE.MA_PARTNER AS MP ON QH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000' LEFT OUTER JOIN
+		      NEOE.MA_PITEM AS MI ON Q.CD_ITEM = MI.CD_ITEM LEFT OUTER JOIN NEOE.MA_CODEDTL AS Z2 ON Q.CD_COMPANY = Z2.CD_COMPANY AND Q.CD_EXCH = Z2.CD_SYSDEF AND Z2.CD_FIELD = 'MA_B000005' 
+	   WHERE(QH.DT_IO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')) AND (Q.FG_PS = '1') AND (Q.FG_IO IN ('001', '030', '031')) AND (QH.CD_COMPANY = '1000') AND (QH.CD_PLANT = '2000' )   	   
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="rc_partner != null and rc_partner !=''"> AND QH.CD_PARTNER = #{rc_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND QH.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+
+	   GROUP BY MP.LN_PARTNER
+) A	 ORDER BY A.CD_PARTNER, A.DT_IO, A.NO_IO, A.CD_ITEM
+	</select>
+	
+	<select id="selectRcPartners" parameterType="map" resultType="map">
+		SELECT	DISTINCT 
+					A.CD_PARTNER,
+		        	A.LN_PARTNER
+		FROM    	NEOE.MA_PARTNER A,
+			        (
+			        	SELECT DISTINCT QH.CD_PARTNER
+			        	FROM  NEOE.MM_QTIOH QH LEFT OUTER JOIN
+                      	NEOE.MM_QTIO AS Q ON QH.NO_IO = Q.NO_IO AND QH.CD_COMPANY = Q.CD_COMPANY
+						WHERE     (QH.DT_IO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-',''))
+						AND (Q.FG_PS = '1') AND (Q.FG_IO IN ('001', '030', '031')) AND (QH.CD_COMPANY = '1000') AND (QH.CD_PLANT = '2000' )
+			        ) B
+		WHERE A.CD_COMPANY = '1000' 
+			     AND A.CD_PARTNER = B.CD_PARTNER
+		ORDER BY A.CD_PARTNER
+	</select>
+	
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="User">
+
+	<resultMap id="resultUserVO" type="com.pnt.user.UserVO">
+		<result property="id" column="user_id" />
+		<result property="name" column="user_nm" />
+		<result property="authInfo" column="auth_info" />
+	</resultMap>
+	
+	<select id="getUserCheck" parameterType="com.pnt.user.UserVO" resultMap="resultUserVO">
+		select
+							distinct
+							cd_partner 	as user_id,
+		    				ln_partner 	as user_nm,
+		    			<choose>
+							<when test= "id == 'admin'">	
+		    					'A'	as auth_info
+		    				</when>
+		    				<otherwise>
+		    					STA_CREDIT	as auth_info
+		    				</otherwise>
+		    			</choose>
+		from neoe.ma_partner		
+		<choose>
+				<when test= "id == 'admin'">
+						where 1 = 1
+							and cd_partner = 'admin'
+		    				and 'raycop@1234' =  #{password}
+				</when>
+				<otherwise>
+						where 1 = 1
+							and cd_partner = #{id}
+		    				and no_merchant = #{password}
+		    				and cd_company = '1000'
+				</otherwise>
+		</choose>		 
+	</select>
+	
+</mapper>

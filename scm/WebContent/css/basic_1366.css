@@ -1,0 +1,10 @@
+@import url("basic_base.css");
+@import url("basic_1280.css");
+
+/*#GAWrap { width:1298px; height:100%; margin:0 auto; min-width:1298px; }*/
+#GAWrap { width:1350px; height:100%; margin:0 auto; min-width:1350px; }
+
+/* Container */
+/*#container {margin:0px;  padding:0; width:1298px; height:654px;}*/
+/*#container {margin:0px;  padding:0; width:1350px; height:680px;}*/
+#container {margin:0px;  padding:0; width:1350px; height:654px;}

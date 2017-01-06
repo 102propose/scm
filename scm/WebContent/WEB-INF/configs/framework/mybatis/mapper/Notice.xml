@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Notice">
+
+	<select id="selectCommonNoticeList" parameterType="com.pnt.main.NoticeVO" resultType="com.pnt.main.NoticeVO">
+		SELECT	MSG_SEQ,
+					CD_PARTNER,
+					DT_MSG_START,
+					DT_MSG_END,
+					TITLE_MSG,
+					TXT_MSG,
+					CHK_YN,
+					QTY_READ,
+					CONVERT( DATE, DT_INSERT) AS DT_INSERT
+		FROM		BOS.dbo.PUR_MSG
+		WHERE	1 = 1
+		<choose>
+			<when test="CD_PARTNER == 'admin'"></when>
+			<otherwise>AND (CD_PARTNER IS NULL OR CD_PARTNER = '') </otherwise>
+		</choose>
+		ORDER BY MSG_SEQ DESC
+	</select>
+	<select id="selectPartnerNoticeList" parameterType="com.pnt.main.NoticeVO" resultType="com.pnt.main.NoticeVO">
+		SELECT	MSG_SEQ,
+					CD_PARTNER,
+					DT_MSG_START,
+					DT_MSG_END,
+					TITLE_MSG,
+					TXT_MSG,
+					CHK_YN,
+					QTY_READ,
+					CONVERT( DATE, DT_INSERT) AS DT_INSERT
+		FROM		BOS.dbo.PUR_MSG
+		WHERE	1 = 1
+		<choose>
+			<when test="CD_PARTNER == null or CD_PARTNER == ''">AND (CD_PARTNER IS NULL or CD_PARTNER='')</when>
+			<otherwise>AND     CD_PARTNER = #{CD_PARTNER}</otherwise>
+		</choose>
+		ORDER BY MSG_SEQ DESC
+	</select>
+	
+	<select id="selectContent" parameterType="int" resultType="com.pnt.main.NoticeVO">
+		SELECT	A.*,
+					(select x.LN_PARTNER from NEOE.MA_PARTNER x where X.CD_COMPANY = '1000' AND a.CD_PARTNER = x.CD_PARTNER) AS LN_PARTNER
+		FROM		BOS.dbo.PUR_MSG A
+		WHERE	A.MSG_SEQ = #{msgSeq}
+	</select>
+	
+<!-- 	<select id="getUsersTotalCount" parameterType="com.pnt.user.UserVO" resultType="int"> -->
+<!-- 			select count(*) as totalRowCount -->
+<!-- 			  from tb_da_dm_jm_ecsfinfobasc -->
+<!-- 			 where 1 = 1 -->
+<!-- 			   and HDOF_DVVL = '1' -->
+<!-- 			   <if test="id != null">and psn_no = #{id}</if> -->
+<!-- 			   <if test="name != null">and name like #{name} || '%'</if> -->
+<!-- 			   <if test="gradeName != null">and pzcnm = #{gradeName}</if> -->
+<!-- 			   <if test="orgName != null">and brnm like #{orgName} || '%'</if> -->
+<!-- 			   <if test="useYN != null">and useyn = #{useYN}</if> -->
+<!-- 			   <if test="roleID != null">and rol_cd = #{roleID}</if> -->
+<!-- 	</select> -->
+	
+<!-- 	<select id="getUsersPaging" parameterType="com.pnt.user.UserVO" resultMap="resultUserVO"> -->
+<!-- 		select psn_no -->
+<!-- 			   ,name -->
+<!-- 			   ,pwd_ec -->
+<!-- 			   ,pzcnm -->
+<!-- 			   ,brnm -->
+<!-- 			   ,rol_cd -->
+<!-- 			   ,useyn -->
+<!-- 			   ,frst_inpp_psn_no -->
+<!-- 			   ,frst_ipdtm -->
+<!-- 			   ,lscgmn_psn_no -->
+<!-- 			   ,lschg_dtm -->
+<!-- 			   ,((#{currPage} - 1) * #{rowCountPerPage}) + rownum as num -->
+<!-- 		 from ( -->
+<!-- 			select rownum as row_cnt, a.* -->
+<!-- 		  	 from ( -->
+<!-- 				select * -->
+<!-- 				  from tb_da_dm_jm_ecsfinfobasc -->
+<!-- 				 where 1 = 1 -->
+<!-- 				   and HDOF_DVVL = '1' -->
+<!-- 				   <if test="id != null">and psn_no = #{id}</if> -->
+<!-- 				   <if test="name != null">and name like #{name} || '%'</if> -->
+<!-- 				   <if test="gradeName != null">and pzcnm = #{gradeName}</if> -->
+<!-- 				   <if test="orgName != null">and brnm like #{orgName} || '%'</if> -->
+<!-- 				   <if test="useYN != null">and useyn = #{useYN}</if> -->
+<!-- 				   <if test="roleID != null">and rol_cd = #{roleID}</if> -->
+<!-- 				 order by name ) a ) -->
+<!-- 		where row_cnt between #{startRow} and #{endRow} -->
+<!-- 	</select> -->
+	
+	<update id="updateReadCount" parameterType="int">
+		UPDATE	BOS.dbo.PUR_MSG
+		SET		QTY_READ = ISNULL(QTY_READ, 0) +1
+		WHERE	MSG_SEQ = #{msgSeq}
+	</update>
+	
+	<update id="updateCheckReadY" parameterType="int">
+		UPDATE	BOS.dbo.PUR_MSG
+		SET		CHK_YN = 'Y'
+		WHERE	MSG_SEQ = #{msgSeq}
+	</update>
+</mapper>

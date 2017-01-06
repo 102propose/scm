@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Ac">
+
+	<select id="getList" parameterType="com.pnt.ac.AcVO" resultType="com.pnt.ac.AcVO">
+			SELECT
+				ROW_NUMBER() OVER(ORDER BY A.CD_PARTNER, A.DT_ACCT, A.NM_NOTE, A.AM_DR) as num,
+				b.ln_partner as cd_partner,
+				a.dt_acct,
+				REPLACE(a.nm_note, '"', '') as nm_note,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, a.am_cr),1),'.00','') as am_cr,				
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, a.am_dr),1),'.00','') as am_dr,				
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, a.am_jan),1),'.00','') as am_jan				
+			FROM
+(
+		SELECT     CD_PARTNER, REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AS DT_ACCT, '(전기이월 금액)' AS NM_NOTE, SUM(AM_DR) AS AM_DR, SUM(AM_CR) AS AM_CR, SUM(AM_CR)-SUM(AM_DR) AS AM_JAN
+		FROM         NEOE.FI_MNGSUM
+	    WHERE (CD_ACCT LIKE '25%')  AND (DT_ACCT BETWEEN '20150100' AND REPLACE(#{dtFr, jdbcType=VARCHAR},'-','')) AND (DT_ACCT != REPLACE(#{dtFr, jdbcType=VARCHAR},'-','')) AND (CD_COMPANY = '1000')  AND (CD_CC = '3000')
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="ac_partner != null and ac_partner !=''"> AND CD_PARTNER = #{ac_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+		GROUP BY CD_PARTNER
+	   UNION
+	   	SELECT     FID.CD_PARTNER, FID.DT_ACCT, FID.NM_NOTE, FID.AM_DR AS DR, FID.AM_CR AS CR, FIM.JAN+FID.AM_DR AS AM_JAN
+		FROM         NEOE.FI_DOCU FID LEFT JOIN
+						(SELECT     CD_PARTNER, DT_ACCT, '잔액' AS NM_NOTE, SUM(AM_DR) AS DR, SUM(AM_CR) AS CR, SUM(AM_CR)- SUM(AM_DR) JAN, TP_DRCR 
+						  FROM NEOE.FI_DOCU
+						WHERE     (CD_ACCT LIKE '25%') AND DT_ACCT >= REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND CD_COMPANY = '1000' AND CD_CC = '3000'
+						<choose>
+							<when test="userId == 'admin'">
+								<if test="ac_partner != null and ac_partner !=''"> AND CD_PARTNER = #{ac_partner, jdbcType=VARCHAR} </if>
+							</when>
+							<otherwise>AND CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+						</choose>						 
+						GROUP BY CD_PARTNER, DT_ACCT, TP_DRCR) FIM ON FID.DT_ACCT = FIM.DT_ACCT AND FID.TP_DRCR = FIM.TP_DRCR				
+	   	WHERE (FID.CD_ACCT LIKE '25%')  AND (FID.DT_ACCT BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')) AND (FID.CD_COMPANY = '1000') AND (FID.CD_CC = '3000')   	   
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="ac_partner != null and ac_partner !=''"> AND FID.CD_PARTNER = #{ac_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND FID.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+) A LEFT JOIN NEOE.MA_PARTNER B ON A.CD_PARTNER = B.CD_PARTNER AND B.CD_COMPANY = '1000'  ORDER BY A.CD_PARTNER, A.DT_ACCT, A.NM_NOTE, A.AM_DR 
+	</select>
+	
+	<select id="selectAcPartners" parameterType="map" resultType="map">
+		SELECT	DISTINCT 
+					A.CD_PARTNER,
+		        	A.LN_PARTNER
+		FROM    	NEOE.MA_PARTNER A,
+			        (
+			        	SELECT DISTINCT FI.CD_PARTNER
+			        	FROM  NEOE.PU_POH PO LEFT JOIN 
+			        		(SELECT DISTINCT CD_PARTNER 
+			        		  FROM NEOE.FI_DOCU
+							 WHERE     (CD_ACCT LIKE '25%')   AND (DT_ACCT BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-',''))) FI
+						ON PO.CD_PARTNER = FI.CD_PARTNER AND (PO.CD_COMPANY = '1000') AND (PO.CD_PLANT = '2000')
+			        ) B
+		WHERE A.CD_COMPANY = '1000' 
+			     AND A.CD_PARTNER = B.CD_PARTNER
+		ORDER BY A.CD_PARTNER
+	</select>
+	
+</mapper>

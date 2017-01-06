@@ -1,0 +1,157 @@
+@charset 'utf-8';
+/*
+	■ 작성자: 김성희
+	■ 마지막 수정자: 김성희
+	■ 최초 작성일: 2013.09.06
+	■ 마지막 수정일: 2013.09.13
+*/
+
+body {
+	scrollbar-face-color:#f2f2f2;
+	scrollbar-shadow-color:#C0C0C0;
+	scrollbar-highlight-color:#dadada;
+	scrollbar-3dlight-color:#f2f2f2;
+	scrollbar-darkshadow-color:#f2f2f2;
+	scrollbar-track-color:#f2f2f2;
+	scrollbar-arrow-color:#C0C0C0;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	min-width: 1020px;
+}
+table {font-family:돋음, Dotum, Arial, sans-serif;font-size:12px;color:#666666; border-collapse:collapse;}
+select {border:1px solid #666666;background:#ffffff;font-family:굴림,  Gulim, Arial, sans-serif;font-size:12px;letter-spacing:-1;color:#333333;vertical-align:middle;}
+form,ul,ol,dl,table,div,h1,h2,h3,h4,p {margin:0;padding:0;}
+.textarea01	{border:1px solid #D3D5D9;background:#f6f6f6}
+th, td {font-family:돋음, Dotum, Arial, sans-serif;font-size:12px;letter-spacing:0;}
+* {margin:0;padding:0;}
+img {border:0;padding:0;margin:0;}
+.input01 {border-top:1px solid #cccccc;border-left:1px solid #cccccc;border-right:1px solid #cccccc;border-bottom:1px solid #cccccc;font:12px 돋움;height:22px;vertical-align:middle;}
+
+/* 정렬 */
+.aC {text-align:center !important;}
+.aT {vertical-align:top !important;}
+.aR {text-align:right !important;}
+.sp_1 {letter-spacing:-1px;}
+
+
+/* 왼쪽 메뉴 */
+
+.left_Menu{background-image:url('images/lMenu_bg.gif'); width:240px; height:36px;padding-left:35px; COLOR:#0066CC;font-size:15px; font-family:맑은고딕, malgun Gothic;}
+.left_Menu a  {text-decoration:none; COLOR:#000000;font-family:맑은고딕, malgun Gothic; font-size:15px;} 
+.left_Menu a:link    { COLOR:#000000; }
+.left_Menu a:visited {COLOR:#000000; }
+.left_Menu a:hover   { COLOR:#0066cc;font-weight: bold; }
+
+.left_Menu2{background-image:url('images/lMenu_bg.gif'); width:240px; height:36px;padding-left:35px; COLOR:#0066CC;font-size:15px;font-weight: bold;  font-family:맑은고딕, malgun Gothic;}
+.left_Menu2 a  {text-decoration:none; COLOR:#0066cc;font-family:맑은고딕, malgun Gothic; font-size:15px;} 
+.left_Menu2 a:link    { COLOR:#0066cc; }
+.left_Menu2 a:visited {COLOR:#0066cc; }
+.left_Menu2 a:hover   { COLOR:#0066cc; }
+
+/* 텍스트 포인트 칼라 */
+.tt {color:#001676;font-weight: bold; font-family:맑은고딕, malgun Gothic; font-size:20px;letter-spacing:-1px;}
+.ptt {color:#001676;font-weight: bold; font-family:맑은고딕, malgun Gothic; font-size:14px;letter-spacing:-1px;}
+.btt {color:#001676;font-weight: bold; font-family:맑은고딕, malgun Gothic; font-size:17px;letter-spacing:-1px;}
+
+
+A {color:#666666;text-decoration:none;font-family:돋음, Dotum;;}
+A:link {color:#666666;}
+A:visited {color:#666666;}
+A:hover {color:#0066CC;}
+
+
+/* 여백 */
+
+.pt3 {padding-top:3px;}
+.pt5 {padding-top:5px;}
+.pt7 {padding-top:7px;}
+.pt10 {padding-top:10px;}
+.pt12 {padding-top:12px;}
+.pt15 {padding-top:15px;}
+.pt20 {padding-top:20px;}
+.pt30 {padding-top:30px;}
+.pt50 {padding-top:50px;}
+.pl10 {padding-left:10px;}
+.pl15 {padding-left:15px;}
+.pl20 {padding-left:20px;}
+.pl25 {padding-left:25px;}
+.pl30 {padding-left:30px;}
+.pl40 {padding-left:40px;}
+.pb5 {padding-bottom:5px;}
+.pb10 {padding-bottom:10px;}
+.pb15 {padding-bottom:15px;}
+.pb20 {padding-bottom:20px;}
+.pr3 {padding-right:3px;}
+.pr10 {padding-right:10px;}
+.pr15 {padding-right:15px;}
+
+
+/* 0910추가 상단 메뉴 */
+td.on{background-image:url('images/menuBg.jpg'); width:130px; height:38px;font-weight: bold;font-family:맑은 고딕, malgun Gothic;font-size:15px; COLOR:#00377d;text-align:center !important;padding-top:6px;}
+td.on a  { text-decoration:none; COLOR:#00377d;font-family:맑은 고딕, malgun Gothic;} 
+td.on a:link    { COLOR:#00377d;}
+td.on a:visited {COLOR:#00377d;}
+td.on a:hover   { COLOR:#00377d;}
+
+td.off{background-image:url('images/menuBg_off.jpg'); width:130px; height:38px;color:#FFFFFF;font-family:맑은 고딕;font-size:15px; font-weight: bold;text-align:center !important;}
+td.off a  { text-decoration:none; COLOR:#FFFFFF;font-family:맑은 고딕, malgun Gothic;} 
+td.off a:link    { COLOR:#FFFFFF;}
+td.off a:visited {COLOR:#FFFFFF;}
+td.off a:hover   { COLOR:#FFFFFF;}
+
+/* 0924 추가 사이트맵 메뉴 */
+.tsyCon3 {}
+.tsyCon3 th {}
+.tsyCon3 td {font-family:돋음, Dotum, Arial;}
+.tsyCon3 td.td1 {font-family:돋음, Dotum, Arial;color:#336699;padding:9px 0px 4px 20px;border-bottom:1px solid #e5e5e5;}
+.tsyCon3 td.td2 {font-family:돋음, Dotum, Arial;font-weight: bold;color:#336699;padding:9px 0px 4px 14px;border-bottom:1px solid #e5e5e5;background-image:url('../images/mapBg.gif'); }
+.tsyCon3 td.td3 {font-family:맑은 고딕, malgun Gothic;font-size:15px;font-weight: bold;letter-spacing:-1;color:#FFFFFF;padding:9px 0px 4px 13px;background-image:url('../images/sitemap_bg1.gif'); width:145px; height:36px; }
+.tsyCon3 td.td4 {font-family:맑은 고딕, malgun Gothic;font-size:15px;font-weight: bold;letter-spacing:-1;color:#FFFFFF;padding:9px 0px 4px 13px;background-image:url('../images/sitemap_bg2.gif'); width:145px; height:36px; }
+		
+.sett {color:#3c6fbc;font-weight: bold;font-size:13px;letter-spacing:-1px;}
+
+/* 130911 - jylee customized start */
+td.on1 {background-image:url('../images/menuBg.jpg'); width:130px; height:38px;font-weight: bold;font-family:맑은 고딕, malgun Gothic;font-size:15px; COLOR:#00377d;text-align:center !important;padding-top:6px;}
+td.on1 a  { text-decoration:none; COLOR:#00377d;font-family:맑은 고딕, malgun Gothic;} 
+td.on1 a:link    { COLOR:#00377d;}
+td.on1 a:visited {COLOR:#00377d;}
+td.on1 a:hover   { COLOR:#00377d;}
+
+td.off1 {background-image:url('../images/menuBg_off.jpg'); width:130px; height:38px;color:#FFFFFF;font-family:맑은 고딕;font-size:15px; font-weight: bold;text-align:center !important;}
+td.off1 a  { text-decoration:none; COLOR:#FFFFFF;font-family:맑은 고딕, malgun Gothic;} 
+td.off1 a:link    { COLOR:#FFFFFF;}
+td.off1 a:visited {COLOR:#FFFFFF;}
+td.off1 a:hover   { COLOR:#FFFFFF;}
+
+td.disabled1 {background-image:url('../images/menuBg_off.jpg'); width:130px; height:38px;color: silver;font-family:맑은 고딕;font-size:15px; font-weight: bold;text-align:center !important;}
+
+td.on2 {color:#0066CC;text-decoration:none;font-family:돋음, Dotum; font-weight: bold;text-align:center !important;}
+td.on2 a  {color:#0066CC;text-decoration:none;font-family:돋음, Dotum;}
+td.on2 a:link    {color:#0066CC;}
+td.on2 a:visited {color:#0066CC;}
+td.on2 a:hover  {color:#0066CC; font-weight: bold}
+
+td.off2 {color:#0066CC;text-decoration:none;font-family:돋음, Dotum; font-weight: bold; text-align:center !important;}
+td.off2 a  {color:#000000;text-decoration:none;font-family:돋음, Dotum;;}
+td.off2 a:link    { COLOR:#000000; }
+td.off2 a:visited {COLOR:#000000; }
+td.off2 a:hover   { COLOR:#0066cc;font-weight: bold; }
+
+td.disabled2 {color:#0066CC;text-decoration:none; color: silver; font-family:돋음, Dotum; font-weight: bold; text-align:center !important;}
+
+td.on3 {background-image:url('../images/lMenu_bg.gif'); width:240px; height:36px;padding-left:35px; COLOR:#0066CC;font-size:15px;font-weight: bold;  font-family:맑은고딕, malgun Gothic;}
+td.on3 a  {text-decoration:none; COLOR:#0066cc;font-family:맑은고딕, malgun Gothic; font-size:15px;} 
+td.on3 a:link    { COLOR:#0066cc; }
+td.on3 a:visited {COLOR:#0066cc; }
+td.on3 a:hover   { COLOR:#0066cc; }
+
+td.off3 {background-image:url('../images/lMenu_bg.gif'); width:240px; height:36px;padding-left:35px; COLOR:#000000;font-size:15px; font-family:맑은고딕, malgun Gothic;}
+td.off3 a  {text-decoration:none; COLOR:#000000;font-family:맑은고딕, malgun Gothic; font-size:15px;} 
+td.off3 a:link    { COLOR:#000000; }
+td.off3 a:visited {COLOR:#000000; }
+td.off3 a:hover   { COLOR:#0066cc;font-weight: bold; }
+
+td.disabled3 {background-image:url('../images/lMenu_bg.gif'); width:240px; height:36px;padding-left:35px; COLOR:silver;font-size:15px; font-family:맑은고딕, malgun Gothic;}
+/* 130911 - jylee customized end */

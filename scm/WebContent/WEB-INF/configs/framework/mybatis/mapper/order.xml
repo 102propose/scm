@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Order">
+
+	<select id="selectCommonOrderList" parameterType="com.pnt.main.OrderVO" resultType="com.pnt.main.OrderVO">
+		SELECT <!-- A.CD_PARTNER, --> 
+					(
+						SELECT LN_PARTNER + ' - ' +  convert(nvarchar(2), month(getdate())) + '월'
+						FROM NEOE.MA_PARTNER AS PINFO
+						WHERE CD_COMPANY = '1000' 
+						AND A.CD_PARTNER = PINFO.CD_PARTNER
+					) AS CD_PARTNER,
+					C_NO_PO_1, Expr1_1, C_NO_PO_2, Expr1_2 
+		FROM
+		(
+			SELECT	NEOE.PU_POH.CD_PARTNER AS CD_PARTNER,
+						COUNT(NEOE.PU_POH.NO_PO) AS C_NO_PO_1, 
+						SUM(CPU_POL.CNO_LINE) AS Expr1_1
+			FROM		NEOE.PU_POH LEFT OUTER JOIN
+						(
+							SELECT	NO_PO, 
+										COUNT(NO_LINE) AS CNO_LINE  
+							FROM		NEOE.PU_POL 
+							GROUP BY NO_PO
+						) AS CPU_POL 
+						ON NEOE.PU_POH.NO_PO = CPU_POL.NO_PO
+			WHERE	<!--(NEOE.PU_POH.DT_PO BETWEEN '20150612' AND '20150711') 
+					  	AND NEOE.PU_POH.CD_PARTNER = '508080' -->
+					  	NEOE.PU_POH.CD_COMPANY = '1000' 
+					  	AND	NEOE.PU_POH.CD_PLANT = '2000'
+						AND	NEOE.PU_POH.DT_PO BETWEEN CONVERT(NVARCHAR(8), GETDATE()-7, 112) AND CONVERT(NVARCHAR(8), GETDATE(), 112)
+						<choose>
+							<when test="CD_PARTNER == null or CD_PARTNER == '' or CD_PARTNER == 'admin'"></when>
+							<otherwise>AND	NEOE.PU_POH.CD_PARTNER = #{CD_PARTNER}</otherwise>
+						</choose>		  	
+			GROUP BY	NEOE.PU_POH.CD_PARTNER
+		) A LEFT OUTER JOIN 
+		(
+			SELECT	NEOE.PU_POH.CD_PARTNER AS CD_PARTNER,
+						COUNT(NEOE.PU_POH.NO_PO) AS C_NO_PO_2,
+						SUM(CPU_POL.CNO_LINE) AS Expr1_2
+			FROM		NEOE.PU_POH LEFT OUTER JOIN
+						(
+							SELECT NO_PO, COUNT(NO_LINE) AS CNO_LINE  
+							FROM  NEOE.PU_POL 
+		             		WHERE CD_USERDEF1 IS NULL 
+		             		GROUP BY NO_PO
+		             	) AS CPU_POL 
+		             	ON NEOE.PU_POH.NO_PO = CPU_POL.NO_PO
+			WHERE  <!--(NEOE.PU_POH.DT_PO BETWEEN '20150612' AND '20150711') 
+						 AND NEOE.PU_POH.CD_PARTNER = '508080' --> 
+						NEOE.PU_POH.TXT_USERDEF1 IS NULL 
+						AND	NEOE.PU_POH.CD_COMPANY = '1000' 
+						AND	NEOE.PU_POH.CD_PLANT = '2000'
+						AND	NEOE.PU_POH.DT_PO BETWEEN CONVERT(NVARCHAR(8), GETDATE()-7, 112) AND CONVERT(NVARCHAR(8), GETDATE(), 112)
+						<choose>
+							<when test="CD_PARTNER == null or CD_PARTNER == '' or CD_PARTNER == 'admin'"></when>
+							<otherwise>AND	NEOE.PU_POH.CD_PARTNER = #{CD_PARTNER}</otherwise>
+						</choose>
+			GROUP BY NEOE.PU_POH.CD_PARTNER
+		) B
+		ON A.CD_PARTNER = B.CD_PARTNER
+	</select>
+</mapper>

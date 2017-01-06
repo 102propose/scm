@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pp">
+
+	<select id="getList" parameterType="com.pnt.pp.PpVO" resultType="com.pnt.pp.PpVO">
+			SELECT
+				ROW_NUMBER() OVER(ORDER BY A.NO_WO, A.CD_ITEM, A.DT_WORK) as num,
+				no_wo,
+				cd_item,
+				nm_item, 
+				REPLACE(REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, qt_item),1),'.00',''), '-0.01', '') as qt_item,				
+				REPLACE(dt_work, '1900-01-01', '실적수량') as dt_work,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, sqt_work),1),'.00','') as qt_work						
+			FROM
+			(
+		       SELECT     PW.NO_WO, PW.CD_ITEM, MI.NM_ITEM, -0.01 AS QT_ITEM, CONVERT( DATE, PW.DT_WORK) AS DT_WORK , SUM(PW.QT_WORK) AS SQT_WORK
+                FROM     NEOE.PR_WORK AS PW LEFT OUTER JOIN
+                             NEOE.MA_PITEM AS MI ON PW.CD_ITEM = MI.CD_ITEM AND MI.CD_COMPANY = '1000' AND MI.CD_PLANT = '2000'
+              WHERE      (PW.DT_WORK BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR}) AND (PW.CD_COMPANY = '1000') AND (PW.CD_PLANT = '2000')
+              GROUP BY PW.NO_WO, PW.CD_ITEM, MI.NM_ITEM, PW.DT_WORK
+              UNION
+              SELECT     PW.NO_WO AS NO_WO, 'SUB-소계' AS CD_ITEM, '계획수량' AS NM_ITEM, PO.QT_ITEM, '19000101' AS DT_WORK, PO.QT_WORK AS SQT_WORK
+               FROM     NEOE.PR_WORK AS PW LEFT OUTER JOIN
+                            NEOE.PR_WO AS PO ON PW.NO_WO = PO.NO_WO AND PO.CD_COMPANY = '1000' AND PO.CD_PLANT = '2000'
+              WHERE     (PW.DT_WORK BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR}) AND (PW.CD_COMPANY = '1000') AND (PW.CD_PLANT = '2000')
+              GROUP BY PW.NO_WO, PO.QT_ITEM, PO.QT_WORK  
+             ) A  ORDER BY A.NO_WO, A.CD_ITEM, A.DT_WORK
+	</select>
+	
+</mapper>

@@ -1,0 +1,82 @@
+@charset 'utf-8';
+/*
+	■ 설명: 갤러리아
+	■ 작성자: 박하윤
+	■ 마지막 수정자: 박하윤
+	■ 최초 작성일: 2014.08.13
+	■ 마지막 수정일: 2014.08.13
+*/
+
+/* COMMON
+body {
+	scrollbar-face-color:#f2f2f2;
+	scrollbar-shadow-color:#C0C0C0;
+	scrollbar-highlight-color:#dadada;
+	scrollbar-3dlight-color:#f2f2f2;
+	scrollbar-darkshadow-color:#f2f2f2;
+	scrollbar-track-color:#f2f2f2;
+	scrollbar-arrow-color:#C0C0C0;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+} */
+
+
+/* Reset */
+html,body{width:100%;height:100%;overflow:hidden; margin:0; padding:0;}
+html{overflow-y:scroll}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button{margin:0;padding:0}
+body,h1,h2,h3,h4,input,button{font-family:"맑은 고딕","Malgun Gothic",'돋움',Dotum,Helvetica,'Apple SD Gothic Neo',Sans-serif;font-size:12px;color:#383d41}
+body{background-color:#ecf1f4; *word-break:break-all;-ms-word-break:break-all}
+img,fieldset,iframe{border:0 none}
+li{list-style:none}
+input,select,button{vertical-align:middle}
+img{vertical-align:top}
+i,em,address{font-style:normal}
+label,button{cursor:pointer}
+button{margin:0;padding:0}
+a{color:#2f3743;text-decoration:none}
+a:hover{color:#390;text-decoration:none}
+button *{position:relative}
+button img{left:-3px;*left:auto}
+html:first-child select{height:20px;padding-right:6px}
+option{padding-right:6px}
+hr{display:none}
+legend{*width:0}
+table{border-collapse:collapse;border-spacing:0}
+
+/* Common */
+.show{display:block}
+.hide{display:none}
+.blind,legend{display:block;overflow:hidden;position:absolute;top:-1000em;left:0}
+.ir{display:block;overflow:hidden;position:relative;z-index:-1;height:11px;font-size:11px;white-space:nowrap}
+.ellipsis{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;-o-text-overflow:ellipsis}
+
+
+table {font-size:16px;color:#666666; border-collapse:collapse;}
+select {border:1px solid #666666;background:#ffffff; font-size:12px;letter-spacing:-1;color:#333333;vertical-align:middle;}
+form,ul,ol,dl,table,div,h1,h2,h3,h4,p {margin:0;padding:0;}
+.textarea01	{border:1px solid #D3D5D9;background:#f6f6f6}
+th, td {font-size:16px;letter-spacing:0;}
+* {margin:0;padding:0;}
+img {border:0;padding:0;margin:0;}
+
+/* 정렬 */
+.aC {text-align:center !important;}
+.aT {vertical-align:top !important;}
+.aR {text-align:right !important;}
+.sp_1 {letter-spacing:-1px;}
+
+
+/* 텍스트 포인트 칼라 */
+
+.tt {color:#10518d;font-weight: bold;  font-size:18px;letter-spacing:-1px;}
+.ptt {color:#001676;font-weight: bold;  font-size:14px;letter-spacing:-1px;}
+.btt {color:#001676;font-weight: bold;  font-size:17px;letter-spacing:-1px;}
+A {color:#b6b6b6;text-decoration:none;}
+A:link {color:#b6b6b6;}
+A:visited {color:#b6b6b6;}
+A:hover {color:#FFFFFF;font-weight: bold;}
+
+.bntClose { position:absolute; right:20px; top:20px;}

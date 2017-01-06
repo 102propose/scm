@@ -1,0 +1,208 @@
+@charset "utf-8";
+
+html, body {
+    scrollbar-face-color:#f2f2f2;
+    scrollbar-shadow-color:#C0C0C0;
+    scrollbar-highlight-color:#dadada;
+    scrollbar-3dlight-color:#f2f2f2;
+    scrollbar-darkshadow-color:#f2f2f2;
+    scrollbar-track-color:#f2f2f2;
+    scrollbar-arrow-color:#C0C0C0;
+    margin-left: 0px;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    width:100%;
+    height: 100%;
+    background-color: #fff;
+}
+form,ul,ol,dl,table,div,h1,h2,h3,h4,p {margin:0;padding:0;}
+/*table {font-family:돋음, Dotum, Arial, sans-serif;font-size:12px;color:#999999; border-collapse:collapse;}*/
+table {font-family:돋음, Dotum, Arial, sans-serif;font-size:12px;color:black; border-collapse:collapse;}
+th, td {font-family:돋음, Dotum, Arial, sans-serif;font-size:12px;letter-spacing:0;}
+* {margin:0;padding:0;}
+img {border:0;padding:0;margin:0;}
+.his {color:#95b3d4;font-size:12px;font-family:돋음, Dotum;}
+.his a {color:#95b3d4;text-decoration:none;font-family:돋음, Dotum;;}
+.his a:link {color:#95b3d4;}
+.his a:visited {color:#95b3d4;}
+.his a:hover {color:#95b3d4;}
+.aT {vertical-align:top !important;}
+.aC {text-align:center !important;}
+
+A {color:#FFFFFF;text-decoration:none;font-family:맑은고딕;}
+A:link {color:#FFFFFF;}
+A:visited {color:#FFFFFF;}
+A:hover {color:#FFFFFF;}
+
+/* 상단 메뉴 */
+td.on{background-image:url('../images/pre/menuBg.jpg'); width:140px; height:38px;font-weight: bold;font-family:맑은 고딕;font-size:14px; COLOR:#00377d;text-align:center !important;padding-top:5px;}
+td.on a  { text-decoration:none; COLOR:#00377d;} 
+td.on a:link    { COLOR:#00377d;}
+td.on a:visited {COLOR:#00377d;}
+td.on a:hover   { COLOR:#00377d;}
+
+td.on2{background-image:url('../images/pre/menuBg2.jpg'); width:180px; height:38px;font-weight: bold;font-family:맑은 고딕;font-size:14px; COLOR:#00377d;text-align:center !important;padding-top:5px;}
+td.on2 a  { text-decoration:none; COLOR:#00377d;} 
+td.on2 a:link    { COLOR:#00377d;}
+td.on2 a:visited {COLOR:#00377d;}
+td.on2 a:hover   { COLOR:#00377d;}
+
+td.off{color:#00377d;font-family:맑은 고딕;font-size:14px; font-weight: bold;text-align:center !important;}
+
+ul {list-style:none; }
+li {background:url(../images/pre/admin_ico02.jpg) 5px 7px no-repeat; padding-left:16px;}
+
+
+/* 2차 메뉴 */
+.menu a.m-normal {color:#666666;text-decoration:none;font-family:돋음, Dotum;;}
+.menu a.m-normal:link {color:#666666;}
+.menu a.m-normal:visited {color:#666666;}
+.menu a.m-normal:hover {color:#0066cc; font-weight: bold;}
+
+.menu a.m-selected {color:#0066cc;text-decoration:none;font-family:돋음, Dotum;;font-weight: bold;}
+.menu a.m-selected:link {color:#0066cc; font-weight: bold;}
+.menu a.m-selected:visited {color:#0066cc; font-weight: bold;}
+.menu a.m-selected:hover {color:#0066cc; font-weight: bold;}
+
+/* 3차 메뉴 */
+.menu1 a {color:#666666;text-decoration:none;font-family:돋음, Dotum;;}
+.menu1 a:link {color:#666666;}
+.menu1 a:visited {color:#666666;}
+.menu1 a:hover {color:#0066cc; font-weight: bold;}
+
+
+.input01 {border-top:1px solid #cccccc;border-left:1px solid #cccccc;border-right:1px solid #cccccc;border-bottom:1px solid #cccccc;font:12px 돋음;height:22px;vertical-align:middle;background:#f1f1f1;}
+.input02 {border-top:1px solid #acb2b8;border-left:1px solid #acb2b8;border-right:1px solid #acb2b8;border-bottom:1px solid #acb2b8;font:12px 돋음;height:22px;vertical-align:middle;background:#FFFFFF;}
+
+/* 정렬 */
+.aC {text-align:center !important;}
+.aT {vertical-align:top !important;}
+.aR {text-align:right !important;}
+.aL {text-align:left !important;}
+.sp0 {letter-spacing:0;}
+.sp_1 {letter-spacing:-1px;}
+
+/* 텍스트 포인트 칼라 */
+.txtb {font-weight: bold;color:#333333;}
+.txt01 {color:#333333;font-size:12px;font-family:돋음, Dotum;letter-spacing:-1px;padding-top:5px;}
+.txte {color:#767885;font-size:12px;font-family:arial;}
+.txtR {color:#ff3300;font-size:12px;font-family:돋음, Dotum;}
+.txt20 {color:#333333;font-size:12px;font-family:맑은고딕;line-height:20px;}
+.adTxt_01{COLOR:#333333;font-weight: bold;font-family: 맑은 고딕, 돋음, Dotum, Arial;font-size:16px;letter-spacing:-1px;}
+.adTxt_02{COLOR:#333333;font-weight: bold;font-family: 맑은 고딕, 돋음, Dotum, Arial;font-size:14px;letter-spacing:-1px;}
+.adTxt_03{COLOR:#000000;font-weight: bold;font-family: 맑은 고딕, 돋음, Dotum, Arial;font-size:22px;letter-spacing:-1px;}
+.b{COLOR:#333333;font-weight: bold;}
+
+/* 여백 */
+.pt5 {padding-top:5px;}
+.pt8 {padding-top:8px;}
+.pt10 {padding-top:10px;}
+.pt13 {padding-top:13px;}
+.pt15 {padding-top:15px;}
+.pt20 {padding-top:20px;}
+.pt40 {padding-top:40px;}
+.pt50 {padding-top:50px;}
+.pl10 {padding-left:10px;}
+.pl12 {padding-left:12px;}
+.pl15 {padding-left:15px;}
+.pl20 {padding-left:20px;}
+.pl25 {padding-left:25px;}
+.pl30 {padding-left:30px;}
+.pl40 {padding-left:40px;}
+.pb10 {padding-bottom:10px;}
+.pb20 {padding-bottom:20px;}
+.pr13 {padding-right:13px;}
+
+/* 테이블 스타일 */
+.tsy1 {}
+.tsy1 td {}
+.tsy1 td.td1 {COLOR:#003366;font-weight: bold;padding-top:8px;padding-bottom:5px;padding-left:5px;}
+.tsy1 td.td1  a  { text-decoration:none; COLOR:#003366;font-weight: bold;} 
+.tsy1 td.td1  a:link    { COLOR:#003366; font-weight: bold; }
+.tsy1 td.td1  a:visited {COLOR:#003366;font-weight: bold; }
+.tsy1 td.td1  a:hover   { COLOR:#0066cc;font-weight: bold; }
+
+.tsy1 td.td2 {padding-left:25px;padding-top:3px;padding-bottom:3px;}
+.tsy1 td.td2  a  { text-decoration:none; COLOR:#666666; } 
+.tsy1 td.td2  a:link    { COLOR:#666666;}
+.tsy1 td.td2  a:visited {COLOR:#666666;}
+.tsy1 td.td2  a:hover   { COLOR:#0066cc;}
+
+.tsy1 td.td3 {padding-left:37px;padding-top:3px;padding-bottom:2px; }
+.tsy1 td.td3  a  { text-decoration:none; COLOR:#333333;} 
+.tsy1 td.td3  a:link    { COLOR:#333333;}
+.tsy1 td.td3  a:visited {COLOR:#666666;}
+.tsy1 td.td3  a:hover   { COLOR:#0066cc;}
+    
+
+.tsy2 {border-top:2px solid #1788c0;border-left:1px solid #FFFFFF;border-right:1px solid #FFFFFF;}
+.tsy2 th {background:#f4f4f4;color:#000000;text-align:center;font-size:12px;font-weight: bold;padding:7px 0px 4px 0px;letter-spacing:-1;border-bottom:1px solid #c2c8c9;border-left:1px solid #c2c8c9;}
+.tsy2 td {color:#333333;padding:4px 0px 2px 0px;border-left:1px solid #c2c8c9;border-right:1px solid #c2c8c9;border-bottom:1px solid #c2c8c9;font-size:12px;line-height:16px;}
+.tsy2 td.td2 {padding:3px 0px 0px 10px}
+.tsy2 td.td3 {text-align:center;}
+
+.tsy3 {border-top:2px solid #1788c0;border-left:1px solid #FFFFFF;border-right:1px solid #FFFFFF;}
+.tsy3 th {background:#f4f4f4;color:#000000;text-align:center;font-size:12px;font-weight: bold;padding:7px 0px 4px 0px;letter-spacing:-1;border-bottom:1px solid #c2c8c9;border-left:1px solid #c2c8c9;}
+.tsy3 td {color:#333333;padding:5px 0px 4px 0px;border-left:1px solid #c2c8c9;border-right:1px solid #c2c8c9;border-bottom:1px solid #c2c8c9;font-size:12px;line-height:16px;}
+.tsy3 td.td1 {background:#ffffd0;}
+.tsy3 td.td2 {padding:3px 0px 0px 10px}
+.tsy3 td.td3 {text-align:center;}
+
+.tsy4 {border-left:1px solid #FFFFFF;border-right:1px solid #FFFFFF;}
+.tsy4 th {background:#f4f4f4;color:#000000;text-align:center;font-size:12px;font-weight: bold;padding:7px 0px 4px 0px;letter-spacing:-1;border-bottom:1px solid #c2c8c9;border-left:1px solid #c2c8c9;}
+.tsy4 td {color:#333333;padding:5px 0px 4px 0px;border-left:1px solid #c2c8c9;border-right:1px solid #c2c8c9;border-bottom:0px solid #c2c8c9;font-size:12px;line-height:16px;}
+.tsy4 td.td1 {background:#ffffd0;}
+.tsy4 td.td2 {padding:3px 0px 0px 10px}
+.tsy4 td.td3 {text-align:center;}
+
+/* 0524 테이블 스타일 추가 */   
+.tsy5 {}
+.tsy5 td {padding-left:10px;padding-top:4px;padding-bottom:2px;}
+.tsy5 td.  a { text-decoration:none; COLOR:#666666; } 
+.tsy5 td.  a:link { COLOR:#666666;}
+.tsy5 td.  a:visited {COLOR:#666666;}
+.tsy5 td.  a:hover { COLOR:#666666;}
+
+/* progress bar */
+div.progress_box {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width:100%; 
+    height: 100%; 
+    display: none;
+    z-index: 9999999999;
+}
+
+.progress_back_panel {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width:100%; 
+    height: 100%; 
+    display: block;
+    opacity:0.4;
+    filter: alpha(opacity=40); 
+    background: #eee;
+}
+     
+.img_progress {
+    position: absolute;
+    left : 40%;
+    top : 47%;
+    z-index: 99999999999;
+    width : 287;
+    height : 60;
+    background-image:url('../images/ext/loading_img.gif');
+}
+
+.img_progress_progress {
+    position: absolute;
+    left : 40%;
+    top : 47%;
+    z-index: 99999999999;
+    width : 287;
+    height : 60;
+    background-image:url('../images/ext/progress_img.gif');
+}

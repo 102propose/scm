@@ -1,0 +1,22 @@
+.dhxtabbar_tabs_base {left: 8px;}
+
+.dhxtabbar_base_dhx_terrace div.dhxtabbar_tabs div.dhxtabbar_tabs_ar_left
+{
+	cursor:default !important;
+	width: 9px !important;
+}
+.dhxtabbar_base_dhx_terrace div.dhxtabbar_tabs div.dhxtabbar_tabs_ar_left div.dhxtabbar_arrow_img
+{
+	border-right:none !important;
+	background:url("imgs/dhxtabbar_terrace/dhxtabbar_arrows_none.png") repeat !important;
+}
+
+.dhxtabbar_base_dhx_terrace div.dhxtabbar_tabs div.dhxtabbar_tabs_ar_right
+{
+	cursor:default !important;
+}
+.dhxtabbar_base_dhx_terrace div.dhxtabbar_tabs div.dhxtabbar_tabs_ar_right div.dhxtabbar_arrow_img
+{
+	border-left:none !important;
+	background:url("imgs/dhxtabbar_terrace/dhxtabbar_arrows_none.png") repeat !important;
+}

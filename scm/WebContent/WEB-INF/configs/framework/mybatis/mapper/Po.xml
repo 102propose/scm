@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Po">
+
+	<select id="getList" parameterType="com.pnt.po.PoVO" resultType="com.pnt.po.PoVO">
+			SELECT 
+				ROW_NUMBER() OVER(ORDER BY TAB0.NO_PO ASC) as num,
+				TAB0.NO_PO 			as no_po,
+				TAB1.LN_PARTNER 		as ln_partner ,
+				CONVERT( DATE, TAB0.DT_PO)	as dt_po,
+				TAB2.CD_ITEM 			as cd_item,				
+				--TAB3.NM_ITEM 			as nm_item,
+				REPLACE(REPLACE(TAB3.NM_ITEM, '"', ''), CHAR(9), '') as nm_item,
+				--TAB3.STND_ITEM 			as stnd_item,
+				REPLACE(TAB3.STND_ITEM, '"', '') AS stnd_item, 				
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.QT_PO_MM),1),'.00','') as qt_po_mm, --발주수량								
+				TAB4.NM_SYSDEF as cd_unit_mm, --환종
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.UM_EX ),1),'.000','') as um, --단가
+				--REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.UM ),1),'.00','') as um,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.AM_EX),1),'.00','') as am, --금액
+				--REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.AM),1),'.00','') as am,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.QT_RCV_MM),1),'.00','') as qt_rcv_mm,
+				REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.QT_PO_MM-QT_RCV_MM),1),'.00','') as qt_diff,
+				(CASE WHEN TAB2.FG_POST= 'C' THEN '완료'
+						WHEN TAB2.FG_POST= 'R'	THEN '진행중'
+						WHEN TAB2.FG_POST= 'S'	THEN 'START'
+						ELSE TAB2.FG_POST END)	as fg_post,
+				CONVERT( DATE, TAB2.DT_LIMIT) as dt_limit --납기일자
+			FROM NEOE.PU_POH TAB0
+				LEFT OUTER JOIN NEOE.MA_PARTNER TAB1 
+					ON TAB0.CD_PARTNER = TAB1.CD_PARTNER AND TAB1.CD_COMPANY = '1000'
+				LEFT OUTER JOIN NEOE.PU_POL TAB2 
+					ON TAB0.NO_PO = TAB2.NO_PO AND TAB2.CD_COMPANY = '1000' AND TAB2.CD_PLANT = '2000' 
+				LEFT OUTER JOIN NEOE.MA_PITEM TAB3
+					ON TAB2.CD_ITEM = TAB3.CD_ITEM AND TAB3.CD_COMPANY = '1000' AND TAB3.CD_PLANT = '2000' 
+				LEFT OUTER JOIN NEOE.MA_CODEDTL TAB4 
+					ON TAB0.CD_EXCH = TAB4.CD_SYSDEF AND TAB4.CD_FIELD = 'MA_B000005' AND TAB4.CD_COMPANY = '1000'   
+			WHERE (TAB0.DT_PO BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR})	 
+				AND TAB0.DT_PO > '20150101'
+				AND TAB0.CD_COMPANY = '1000'
+				AND TAB0.CD_PLANT = '2000'
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="po_partner != null and po_partner !=''"> AND TAB1.CD_PARTNER = #{po_partner, jdbcType=VARCHAR} </if>
+					</when>
+					<otherwise>AND TAB1.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>			 	
+	</select>
+	
+	<select id="selectPoHeadInfo" parameterType="com.pnt.po.PoInfoVO" resultType="com.pnt.po.PoInfoVO">
+		SELECT DISTINCT 
+			A.NO_PO AS no_po, --제품PO
+			CONVERT(DATE, A.DT_PO) AS DT_PO, --발주일자	
+			B.LN_PARTNER, --파트너사명
+			B.DC_ADS1_H, --회사위치
+			(CASE WHEN B.NO_TEL = '' OR B.NO_TEL IS NULL THEN ' - - ' ELSE B.NO_TEL END) AS NO_TEL, -- 회사전화번호
+			(CASE WHEN B.NO_FAX = '' OR B.NO_FAX IS NULL THEN ' - - ' ELSE B.NO_FAX END) AS NO_FAX, -- 회사팩스번호
+			B.TP_JOB, --상위업종유형
+			B.CLS_JOB --하위업종유형			
+		FROM
+				NEOE.NEOE.PU_POH A ,
+				NEOE.NEOE.MA_PARTNER B,
+				NEOE.NEOE.PU_POL C,
+				NEOE.NEOE.MA_PITEM D
+		WHERE (A.CD_PARTNER = B.CD_PARTNER
+				AND B.CD_COMPANY = '1000'
+				AND D.CD_PLANT = '2000'
+				AND A.NO_PO = C.NO_PO
+				AND C.CD_ITEM = D.CD_ITEM)
+				AND A.NO_PO = #{po_no, jdbcType=VARCHAR}		 
+				AND (A.DT_PO BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR})	
+	</select>	
+	
+	<select id="selectPoInfo" parameterType="com.pnt.po.PoInfoVO" resultType="com.pnt.po.PoInfoVO">
+			SELECT
+					*
+			FROM
+			(
+				SELECT
+					 
+					 ROW_NUMBER() OVER(ORDER BY TAB3.CD_ITEM ASC) as num,
+					 TAB3.CD_ITEM as cd_item, --품목코드 
+					 NM_ITEM as nm_item,  --품목명
+					 REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.QT_PO_MM),1),'.00','') as qt_po_nm, --수량
+					 REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.UM_EX ),1),'.000','') as um_ex, --단가
+					 REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.AM_EX),1),'.00','') as am_ex, --금액
+					 CD_UNIT_MM as cd_unit_mm, --단위
+					 STND_ITEM as stnd_item,  --규격
+					 CONVERT( DATE, DT_LIMIT) as dt_limit, --납기일자					 
+					 --(CASE WHEN (TAB3.CLS_ITEM='' OR TAB3.CLS_ITEM IS NULL) THEN '' ELSE TAB3.CLS_ITEM END) AS nm_cls_item,
+					 '' AS nm_cls_item,
+					 (CASE WHEN (TAB0.DC50_PO='' OR TAB0.DC50_PO IS NULL) THEN '' ELSE TAB0.DC50_PO END) AS dc_rmk21,
+					 REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, TAB2.VAT),1),'.00','') AS vat
+				FROM
+						NEOE.NEOE.PU_POH TAB0 LEFT JOIN
+						NEOE.NEOE.MA_PARTNER TAB1 ON TAB0.CD_PARTNER = TAB1.CD_PARTNER AND TAB1.CD_COMPANY = '1000' LEFT JOIN
+						NEOE.NEOE.PU_POL TAB2  ON TAB0.NO_PO = TAB2.NO_PO AND TAB2.CD_COMPANY = '1000' AND TAB2.CD_PLANT = '2000' LEFT JOIN 
+						NEOE.NEOE.MA_PITEM TAB3 ON TAB2.CD_ITEM = TAB3.CD_ITEM AND TAB3.CD_COMPANY = '1000' AND TAB3.CD_PLANT = '2000'
+				WHERE (TAB0.NO_PO = #{po_no, jdbcType=VARCHAR}	)				 
+						AND (TAB0.DT_PO BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR})
+			) A
+			--WHERE NUM <![CDATA[ <= ]]> 10
+	</select>
+		
+	<select id="selectPoPartners" parameterType="map" resultType="map">
+		SELECT	DISTINCT 
+					A.CD_PARTNER,
+		        	(A.CD_PARTNER+' '+A.LN_PARTNER) as LN_PARTNER
+		FROM    	NEOE.MA_PARTNER A,
+			        (
+			        	SELECT DISTINCT CD_PARTNER
+			        	FROM  NEOE.PU_POH
+			        	WHERE CD_COMPANY = '1000' AND CD_PLANT = '2000' AND 
+			        	          DT_PO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')
+			        ) B
+		WHERE A.CD_COMPANY = '1000' 
+			     AND A.CD_PARTNER = B.CD_PARTNER
+		ORDER BY A.CD_PARTNER
+	</select>
+	
+	<update id="firstOpenPdf1" parameterType="com.pnt.po.PoVO" >
+		UPDATE NEOE.PU_POL
+		SET CD_USERDEF1 = convert(varchar(8), getdate(), 112)
+		WHERE NO_PO = #{no_po, jdbcType=VARCHAR}
+			AND CD_USERDEF1 IS NULL
+	</update>
+	
+	<update id="firstOpenPdf2" parameterType="com.pnt.po.PoVO" >
+		UPDATE NEOE.PU_POH
+		SET TXT_USERDEF1 = convert(varchar(8), getdate(), 112)
+		WHERE NO_PO = #{no_po, jdbcType=VARCHAR}
+			AND TXT_USERDEF1 IS NULL
+	</update>
+
+	
+</mapper>

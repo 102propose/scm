@@ -1,0 +1,9 @@
+@import url("basic_base.css");
+
+html, body { width:100%; margin:0px; padding:0px; font-familiy:맑은 고딕; }
+body {background:url(../images/popup1.png) no-repeat;}
+.container { width:100%; }
+.title { width:80%; height:50px; margin-top:8px; margin-left:60px; font-size:28px;}
+.content { width:90%; height:225px; margin-left:22px; padding:10px; overflow-y:auto; }
+.checkable { width:93%; text-align:right; margin-left:22px; margin-top:12px; }
+.closable { position:absolute; top:18px; left:565px; width:30px; height:30px; cursor:pointer; }

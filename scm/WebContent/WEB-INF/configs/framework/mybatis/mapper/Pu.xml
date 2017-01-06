@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pu">
+
+	<select id="selectPartners" parameterType="map" resultType="map">
+		SELECT	DISTINCT 
+					POH.CD_PARTNER
+					, (POH.CD_PARTNER+' '+MP.LN_PARTNER) as LN_PARTNER
+		FROM    	NEOE.PU_POH POH
+		LEFT JOIN NEOE.MA_PARTNER MP ON POH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000'
+		WHERE POH.DT_PO BETWEEN REPLACE(#{dtFr, jdbcType=VARCHAR},'-','') AND REPLACE(#{dtTo, jdbcType=VARCHAR},'-','')  
+		AND POH.CD_COMPANY = '1000' 
+		AND POH.CD_PLANT = '2000'
+		ORDER BY POH.CD_PARTNER
+	</select>
+	
+	<select id="getList" parameterType="com.pnt.pu.PuVO" resultType="com.pnt.pu.PuVO"> 
+	SELECT
+			T2.SEQ,
+			T1.CD_PARTNER 	AS partnerCode, --파트너회사코드
+			T1.NO_PO			AS produceNum, --발주번호	
+			T1.CD_ITEM			AS itemCode, --품목코드
+			(CASE WHEN T2.SEQ='1' THEN NO_PO ELSE CONVERT( VARCHAR, NO_LINE) END) 	AS comCol1, -- 발주번호 / 순번
+			(CASE WHEN T2.SEQ='1' THEN CD_ITEM ELSE CD_UNIT_MM END) AS comCol2, --품목코드 / 단위
+			(CASE WHEN T2.SEQ='1' THEN REPLACE(REPLACE(REPLACE(NM_ITEM, '"', ''),'[','【'),']','】') ELSE REPLACE(REPLACE(REPLACE(STND_ITEM, '"', ''),'[','【'),']','】') END) AS comCol3, --품명 / 규격			
+			(CASE WHEN T2.SEQ='1' THEN CONVERT( DATE, DT_PO) ELSE CONVERT( DATE, DT_LIMIT) END) AS comCol4, --발주일자 / 납기일자
+			(CASE WHEN T2.SEQ='1' THEN FG_UM_EXCH ELSE CONVERT( VARCHAR, CONVERT(MONEY, UM_EX)) END) AS comCol5, --환종 / 단가
+			(CASE WHEN T2.SEQ='1' THEN REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_PO),1),'.00','') ELSE REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_REMAINDER),1),'.00','') END) AS comCol6, --발주수량 / 발주잔량
+			(CASE WHEN T2.SEQ='1' THEN IsNull(REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_DO),1),'.00',''),0) ELSE IsNull(REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_RCV),1),'.00',''),0) END) AS comCol7, --당일D/O수량 / 납품수량
+			(CASE WHEN T2.SEQ='1' THEN CONVERT(VARCHAR,CONVERT( DATE, IsNull(DT_RCV, #{dt, jdbcType=VARCHAR}))) ELSE '0' END) AS comCol8, --납품일자 / 금액
+			--(CASE WHEN T2.SEQ='1' THEN IsNull(DESC_RCV,'') ELSE IsNull(DST_RCV,'') END) AS comCol9	-- 전달사항 / 납품장소
+			''  AS comCol9 -- 전달사항 / 납품장소
+	FROM
+	(
+			SELECT 
+				POH.CD_PARTNER, 
+				MP.LN_PARTNER, 
+				POH.NO_PO, 
+				POL.NO_LINE, 
+				POL.CD_ITEM, 
+				POL.CD_UNIT_MM, 
+				MI.NM_ITEM, 
+				MI.STND_ITEM, 
+				POH.DT_PO, 
+				POL.DT_LIMIT, 
+				MC.NM_SYSDEF AS FG_UM_EXCH, --환종
+				POL.UM_EX, POL.QT_PO, 
+				(POL.QT_PO - POL.QT_RCV) AS QT_REMAINDER,
+				null as DT_RCV, --PUR.DT_RCV, --납품일자
+				null as DESC_RCV, --PUR.DESC_RCV, --전달사항
+				PD.QT_DO, -- DO입력수량 
+				0 as QT_RCV, --PUR.QT_RCV, --납품수량
+				null as DST_RCV --PUR.DST_RCV --납품장소
+			FROM NEOE.PU_POH POH LEFT JOIN NEOE.PU_POL POL ON POH.NO_PO = POL.NO_PO
+--			LEFT JOIN BOS.DBO.PUR_RCV PUR ON POH.NO_PO = PUR.NO_PO AND POL.CD_ITEM = PUR.CD_ITEM								
+			LEFT JOIN NEOE.MA_PARTNER MP ON POH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000'								
+			LEFT JOIN NEOE.MA_PITEM MI ON POL.CD_ITEM = MI.CD_ITEM AND MI.CD_COMPANY = '1000' AND MI.CD_PLANT = '2000'								
+			LEFT JOIN NEOE.MA_CODEDTL MC ON MC.CD_FIELD = 'MA_B000005' AND POH.CD_EXCH = MC.CD_SYSDEF AND MC.CD_COMPANY = '1000'  								
+			LEFT JOIN 
+			(
+				
+				SELECT A.CD_ITEM, A.QT_DO FROM BOS.dbo.PUR_DO A,
+				(
+					SELECT DISTINCT(MAX(SEQ_DO)) AS SEQ_DO, CD_ITEM FROM BOS.dbo.PUR_DO WHERE  DT_DO = #{dt, jdbcType=VARCHAR}  
+					<choose>
+						<when test="userId == 'admin'">
+							<if test="partner != null and partner !=''"> 
+										AND CD_PARTNER = #{partner, jdbcType=VARCHAR}
+							</if>
+						</when>
+						<otherwise>AND CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+					</choose>
+					GROUP BY CD_ITEM) B
+				WHERE A.CD_ITEM = B.CD_ITEM AND A.SEQ_DO = B.SEQ_DO AND A.DT_DO = #{dt, jdbcType=VARCHAR}
+				<choose>
+					<when test="userId == 'admin'">
+						<if test="partner != null and partner !=''"> 
+									AND A.CD_PARTNER = #{partner, jdbcType=VARCHAR}
+						</if>
+					</when>
+					<otherwise>AND A.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+				</choose>
+			) PD ON POL.CD_ITEM = PD.CD_ITEM 								
+			WHERE (POL.QT_PO - POL.QT_RCV) > 0 AND  -- 발주잔량 남은 발주만 보이게 함						
+			POL.DT_LIMIT BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR}
+			<choose>
+				<when test="userId == 'admin'">
+					<if test="partner != null and partner !=''"> 
+								AND POH.CD_PARTNER = #{partner, jdbcType=VARCHAR} 
+					</if>
+				</when>
+				<otherwise>AND POH.CD_PARTNER = #{userId, jdbcType=VARCHAR} </otherwise>
+			</choose>
+			AND POH.CD_COMPANY = '1000' 
+			AND POH.CD_PLANT = '2000'  								
+	) T1,
+	(SELECT '1' AS SEQ UNION ALL SELECT '2' AS SEQ) T2
+			
+				
+	</select>	
+	
+	<select id="selectDataYn" parameterType="map" resultType="int">
+		SELECT	COUNT(NO_RCV)
+		FROM    BOS.DBO.PUR_RCV
+		WHERE	CD_PARTER = #{cdPartner}
+		AND		CD_ITEM = #{cdItem}
+	</select>
+	
+	<delete id="deleteData" parameterType="map">
+		DELETE	FROM BOS.DBO.PUR_RCV
+		WHERE	CD_PARTER = #{cdPartner}
+		AND		CD_ITEM = #{cdItem}
+	</delete>
+	
+	<select id="selectMaxSeq" parameterType="map" resultType="int">
+		SELECT	(CASE WHEN LEN(count(1)+1)=1 THEN '0'+convert(char,count(1)+1)
+						ELSE convert(char,count(1)+1) END) AS MAX_SEQ
+		FROM    BOS.DBO.PUR_RCV
+		WHERE	CD_PARTER = #{cdPartner}		
+		AND		DT_RCV = REPLACE(#{dtRcv}, '-', '')
+	</select>
+	
+	<insert id="insertData" parameterType="map">
+		INSERT INTO BOS.DBO.PUR_RCV
+		(
+		CD_PARTER, NO_RCV, SEQ_RCV, NO_PO, CD_ITEM
+		, DT_RCV, QT_RCV, DESC_RCV, DST_RCV, DT_INSERT
+		, ID_INSERT
+		)
+		VALUES
+		(
+		#{cdPartner}, #{noRcv}, #{seqRcv}, #{noPo}, #{cdItem}
+		, REPLACE(#{dtRcv}, '-', ''), #{qtRcv, jdbcType=NUMERIC}, #{descRcv}, #{dstRcv}, GETDATE()
+		,#{id}
+		)
+	</insert>
+	
+	<select id="selectPuHeadInfo" parameterType="com.pnt.pu.PuInfoVO" resultType="com.pnt.pu.PuInfoVO">
+		SELECT DISTINCT 
+			A.NO_PO AS no_po, --제품PO
+			B.NO_COMPANY AS no_company, --사업자번호
+			B.LN_PARTNER AS ln_partner, --파트너사명
+			B.NM_CEO AS nm_ceo, --성명			
+			B.DC_ADS1_H AS dc_ads1_h, --회사위치
+			B.TP_JOB AS tp_job, --상위업종유형
+			B.CLS_JOB AS cls_job  --하위업종유형			
+		FROM
+				NEOE.NEOE.PU_POH A 
+				LEFT OUTER JOIN NEOE.NEOE.MA_PARTNER B				
+					ON A.CD_PARTNER = B.CD_PARTNER AND B.CD_COMPANY = '1000'
+		WHERE 
+				A.NO_PO = #{po_no, jdbcType=VARCHAR}
+				AND (A.DT_PO BETWEEN #{dtFr, jdbcType=VARCHAR} AND #{dtTo, jdbcType=VARCHAR})
+	</select>
+	
+	<select id="selectPuHistory" parameterType="com.pnt.pu.PuVO" resultType="map">
+		SELECT DISTINCT
+			--(CD_PARTER+'-'+DT_RCV) AS PA_DT_RCV
+			(CD_PARTER+'-'+SUBSTRING(RIGHT(NO_RCV,10),0,9)+'-'+RIGHT(NO_RCV,2)) AS PA_DT_RCV
+		FROM BOS.DBO.PUR_RCV
+		WHERE 1=1
+			<choose>
+				<when test="partner != null and partner !=''">
+					AND CD_PARTER = #{partner, jdbcType=VARCHAR}
+				</when>
+				<otherwise>AND CD_PARTER = #{userId, jdbcType=VARCHAR}</otherwise>
+			</choose>
+			AND DT_RCV = #{dt, jdbcType=VARCHAR}			
+		ORDER BY (CD_PARTER+'-'+SUBSTRING(RIGHT(NO_RCV,10),0,9)+'-'+RIGHT(NO_RCV,2)) DESC
+	</select>
+	
+	<select id="selectHistoryList" parameterType="com.pnt.pu.PuVO" resultType="com.pnt.pu.PuVO"> 
+		SELECT
+			T2.SEQ,
+			T1.CD_PARTNER 	AS partnerCode, --파트너회사코드
+			T1.NO_PO			AS produceNum, --발주번호	
+			T1.CD_ITEM			AS itemCode, --품목코드
+			(CASE WHEN T2.SEQ='1' THEN NO_PO ELSE CONVERT( VARCHAR, NO_LINE) END) 	AS comCol1, -- 발주번호 / 순번
+			(CASE WHEN T2.SEQ='1' THEN CD_ITEM ELSE CD_UNIT_MM END) AS comCol2, --품목코드 / 단위
+			(CASE WHEN T2.SEQ='1' THEN NM_ITEM ELSE REPLACE(STND_ITEM, '"', '') END) AS comCol3, --품명 / 규격
+			(CASE WHEN T2.SEQ='1' THEN CONVERT( DATE, DT_PO) ELSE CONVERT( DATE, DT_LIMIT) END) AS comCol4, --발주일자 / 납기일자
+			(CASE WHEN T2.SEQ='1' THEN FG_UM_EXCH ELSE CONVERT( VARCHAR, CONVERT(MONEY, UM_EX)) END) AS comCol5, --환종 / 단가
+			(CASE WHEN T2.SEQ='1' THEN REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_PO),1),'.00','') ELSE REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_REMAINDER),1),'.00','') END) AS comCol6, --발주수량 / 발주잔량
+			(CASE WHEN T2.SEQ='1' THEN REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, ''),1),'.00','') ELSE IsNull(REPLACE(CONVERT(VARCHAR,CONVERT(MONEY, QT_RCV),1),'.00',''),0) END) AS comCol7, --당일D/O수량 / 납품수량
+			(CASE WHEN T2.SEQ='1' THEN CONVERT(VARCHAR,CONVERT( DATE, DT_RCV)) ELSE '0' END) AS comCol8, --납품일자 / 금액
+			(CASE WHEN T2.SEQ='1' THEN IsNull(DESC_RCV,'') ELSE IsNull(DST_RCV,'') END) AS comCol9	-- 전달사항 / 납품장소
+		FROM
+		(
+			SELECT 
+				POH.CD_PARTNER, --파트너회사코드
+				MP.LN_PARTNER, --파트너회사명
+				POH.NO_PO, --발주번호
+				POL.NO_LINE, --순번
+				POL.CD_ITEM, --품목코드
+				POL.CD_UNIT_MM, --단위
+				MI.NM_ITEM, --품목명
+				MI.STND_ITEM, --규격
+				POH.DT_PO, --발주일자
+				POL.DT_LIMIT, --납기일자
+				MC.NM_SYSDEF AS FG_UM_EXCH, --환종
+				POL.UM_EX, POL.QT_PO, 
+				(POL.QT_PO - POL.QT_RCV) AS QT_REMAINDER,
+				PUR.DT_RCV, --납품일자
+				PUR.DESC_RCV, --전달사항
+				PUR.QT_RCV, --납품수량
+				PUR.DST_RCV --납품장소
+			FROM NEOE.PU_POH POH LEFT JOIN NEOE.PU_POL POL ON POH.NO_PO = POL.NO_PO
+			LEFT JOIN BOS.DBO.PUR_RCV PUR ON POH.NO_PO = PUR.NO_PO AND POL.CD_ITEM = PUR.CD_ITEM	AND POL.NO_LINE = PUR.SEQ_RCV							
+			LEFT JOIN NEOE.MA_PARTNER MP ON POH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000'								
+			LEFT JOIN NEOE.MA_PITEM MI ON POL.CD_ITEM = MI.CD_ITEM AND MI.CD_COMPANY = '1000' AND MI.CD_PLANT = '2000'								
+			LEFT JOIN NEOE.MA_CODEDTL MC ON MC.CD_FIELD = 'MA_B000005' AND POH.CD_EXCH = MC.CD_SYSDEF AND MC.CD_COMPANY = '1000'  															
+			WHERE POH.CD_COMPANY = '1000' 
+				AND POH.CD_PLANT = '2000'  
+				AND PUR.NO_RCV = #{noRcv, jdbcType=VARCHAR}
+		) T1,
+		(SELECT '1' AS SEQ UNION ALL SELECT '2' AS SEQ) T2
+	</select>
+	
+	<select id="selectPuHistoryHeadInfo" parameterType="com.pnt.pu.PuVO" resultType="com.pnt.pu.PuInfoVO">
+		SELECT DISTINCT
+			NO_COMPANY AS no_company, --사업자번호
+			LN_PARTNER AS ln_partner, --파트너사명
+			NM_CEO AS nm_ceo, --성명			
+			DC_ADS1_H AS dc_ads1_h, --회사위치
+			TP_JOB AS tp_job, --상위업종유형
+			CLS_JOB AS cls_job  --하위업종유형			
+		FROM NEOE.NEOE.MA_PARTNER
+		WHERE CD_COMPANY = '1000'
+				AND CD_PARTNER = #{cd_partner, jdbcType=VARCHAR}				
+	</select>
+	
+	<select id="selectPuHistoryPdfList" parameterType="com.pnt.pu.PuVO" resultType="com.pnt.pu.PuInfoVO">
+		
+		SELECT
+			POH.NO_PO as no_po, --발주번호			
+			PUR.DT_RCV as dt_rcv, --납품일자
+			POL.CD_ITEM as cd_item, --품목코드			
+			MI.NM_ITEM as nm_item, --품목명
+			REPLACE(MI.STND_ITEM, '"', '') as stnd_item, --규격
+			POL.CD_UNIT_MM as cd_unit_mm, --단위	
+			REPLACE(CONVERT(VARCHAR,round(PUR.QT_RCV,0)),'.0000','') as qt_rcv, --납품수량
+			PUR.DESC_RCV as desc_rcv --전달사항			
+			--PUR.DST_RCV --납품장소
+		FROM NEOE.PU_POH POH LEFT JOIN NEOE.PU_POL POL ON POH.NO_PO = POL.NO_PO
+		LEFT JOIN BOS.DBO.PUR_RCV PUR ON POH.NO_PO = PUR.NO_PO AND POL.CD_ITEM = PUR.CD_ITEM AND POL.NO_LINE = PUR.SEQ_RCV						
+		LEFT JOIN NEOE.MA_PARTNER MP ON POH.CD_PARTNER = MP.CD_PARTNER AND MP.CD_COMPANY = '1000'								
+		LEFT JOIN NEOE.MA_PITEM MI ON POL.CD_ITEM = MI.CD_ITEM AND MI.CD_COMPANY = '1000' AND MI.CD_PLANT = '2000'								
+		LEFT JOIN NEOE.MA_CODEDTL MC ON MC.CD_FIELD = 'MA_B000005' AND POH.CD_EXCH = MC.CD_SYSDEF AND MC.CD_COMPANY = '1000'  								
+		WHERE POH.CD_COMPANY = '1000' 
+			AND POH.CD_PLANT = '2000'
+			AND PUR.NO_RCV = #{noRcv, jdbcType=VARCHAR}
+								
+	</select>
+	
+</mapper>

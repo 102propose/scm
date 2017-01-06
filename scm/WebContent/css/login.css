@@ -1,0 +1,103 @@
+@charset 'euc-kr';
+/*
+	¡á ¼³¸í: °¶·¯¸®¾Æ
+	¡á ÀÛ¼ºÀÚ: ±è¼ºÈñ
+	¡á ¸¶Áö¸· ¼öÁ¤ÀÚ: ±è¼ºÈñ
+	¡á ÃÖÃÊ ÀÛ¼ºÀÏ: 2014.09.09
+	¡á ¸¶Áö¸· ¼öÁ¤ÀÏ: 2014.09.10
+*/
+
+body {
+	scrollbar-face-color:#f2f2f2;
+	scrollbar-shadow-color:#C0C0C0;
+	scrollbar-highlight-color:#dadada;
+	scrollbar-3dlight-color:#f2f2f2;
+	scrollbar-darkshadow-color:#f2f2f2;
+	scrollbar-track-color:#f2f2f2;
+	scrollbar-arrow-color:#C0C0C0;	
+	margin-top: 0px;
+	background:#EBF7FF;
+	text-align:center !important;
+}
+table {font-family:µ¸À½, Dotum, Arial, sans-serif; font-size:13px;color:#d4d4d4; border-collapse:collapse;}
+select {border:1px solid #666666;background:#ffffff;font-family:±¼¸²,  Gulim, Arial, sans-serif;font-size:12px;letter-spacing:-1;color:#333333;vertical-align:middle;}
+form,ul,ol,dl,table,div,h1,h2,h3,h4,p {margin:0;padding:0;}
+.textarea01	{border:1px solid #D3D5D9;background:#f6f6f6}
+.input {border-top:1px solid #8b898c;border-left:1px solid #8b898c;border-right:1px solid #8b898c;border-bottom:1px solid #8b898c;font:20px µ¸À½;height:29px;vertical-align:middle;background:#FFFFFF;}
+.input01 {border-top:1px solid #8b898c;border-left:1px solid #8b898c;border-right:1px solid #8b898c;border-bottom:1px solid #8b898c;font:20px µ¸À½;height:25px;vertical-align:middle;background:#FFFFFF;}
+th, td {font-family:µ¸À½, Dotum, Arial, sans-serif; font-size:13px;letter-spacing:0;}
+* {margin:0;padding:0;}
+img {border:0;padding:0;margin:0;}
+
+/* Á¤·Ä */
+.aC {text-align:center !important;}
+.aT {vertical-align:top !important;}
+.aR {text-align:right !important;}
+.sp_1 {letter-spacing:-1px;}
+
+
+/* ÅÇ ¸Þ´º  */
+
+
+
+.tab_on {background-image:url('images/tabOn.jpg');  width:200px; height:46px; font-weight: bold; font-family:µ¸À½, Dotum, Arial, sans-serif;font-size:17px; text-align:center !important; letter-spacing:-1; COLOR:#0066CC; padding-top:8px;}
+.tab_on a  {text-decoration:none; COLOR:#646b70;} 
+.tab_on a:link    { COLOR:#646b70; }
+.tab_on a:visited {COLOR:#646b70; }
+.tab_on a:hover   { COLOR:#646b70; }
+
+.tab_off {background-image:url('images/tabOff.jpg');  width:200px; height:46px; COLOR:#0066CC;font-size:17px;font-weight: bold;  padding-top:12px; font-family:µ¸À½, Dotum, Arial, sans-serif; text-align:center !important;letter-spacing:-1; }
+.tab_off a  {text-decoration:none; COLOR:#FFFFFF;} 
+.tab_off a:link    { COLOR:#FFFFFF; }
+.tab_off a:visited {COLOR:#FFFFFF; }
+.tab_off a:hover   { COLOR:#FFFFFF; }
+
+
+/* ÅØ½ºÆ® Æ÷ÀÎÆ® Ä®¶ó */
+
+.tt {color:#10518d;font-weight: bold; font-family:µ¸À½, Dotum, Arial, sans-serif; font-size:18px;letter-spacing:-1px;}
+.ptt {color:#001676;font-weight: bold; font-family:µ¸À½, Dotum, Arial, sans-serif; font-size:14px;letter-spacing:-1px;}
+.btt {color:#001676;font-weight: bold; font-family:µ¸À½, Dotum, Arial, sans-serif; font-size:17px;letter-spacing:-1px;}
+
+.list {list-style-type:none; padding-left : 10px;padding-top : 0px;  margin-top:0; font-family:¸¼Àº°íµñ, Malgun Gothic, Arial, sans-serif;font-size:18px;line-height:40px; background:url(images/ico02.gif) no-repeat left 20px;}
+.list a  {text-decoration:none; COLOR:#dfe1e6;} 
+.list a:link    { COLOR:#dfe1e6; }
+.list a:visited {COLOR:#dfe1e6; }
+.list a:hover   { COLOR:#FFFFFF; }
+
+A {color:#b6b6b6;text-decoration:none;}
+A:link {color:#b6b6b6;}
+A:visited {color:#b6b6b6;}
+A:hover {color:#FFFFFF;font-weight: bold;}
+
+
+/* ¿©¹é */
+
+.pt3 {padding-top:3px;}
+.pt5 {padding-top:5px;}
+.pt7 {padding-top:7px;}
+.pt10 {padding-top:10px;}
+.pt12 {padding-top:12px;}
+.pt15 {padding-top:15px;}
+.pt20 {padding-top:20px;}
+.pt30 {padding-top:30px;}
+.pt35 {padding-top:35px;}
+.pt50 {padding-top:50px;}
+.pl10 {padding-left:10px;}
+.pl15 {padding-left:15px;}
+.pl20 {padding-left:20px;}
+.pl25 {padding-left:25px;}
+.pl30 {padding-left:30px;}
+.pl40 {padding-left:40px;}
+.pb5 {padding-bottom:5px;}
+.pb10 {padding-bottom:10px;}
+.pb15 {padding-bottom:15px;}
+.pb20 {padding-bottom:20px;}
+.pr5 {padding-right:5px;}
+.pr10 {padding-right:10px;}
+.pr15 {padding-right:15px;}
+
+
+.login-message {font-family:¸¼Àº °íµñ; font-size:12px; display:block; font-weight:bold; color:red;}
+
+
